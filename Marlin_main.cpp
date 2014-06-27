@@ -2377,7 +2377,7 @@ void process_commands()
         if(code_seen(axis_codes[i])) max_arm_length[i] = code_value();
       }
       break;
-	case 666: // M665 set GUS shoulder height calibration values
+	case 666: // M666 set GUS shoulder height calibration values
       for(int8_t i=0; i < 3; i++)
       {
         if(code_seen(axis_codes[i])) shoulder_height[i] = code_value();
@@ -3266,28 +3266,25 @@ void clamp_to_software_endstops(float target[3])
 #ifdef GUS
 // For the GUS, read delta_tower as GUS arm.
 
-// The geometry of a GUS is such that the arms MUST push up.
-// Thus the base of each arm is below the Z == 0 plane.
-// Note: The only useful thing this does is update the z value
-//       Radius is a build constant that cannot be adjusted
+// There is nothing to recalculate at the moment
 void recalc_delta_settings()
 {   
-	 delta_tower1_z= -shoulder_height[X_AXIS];	 // front left tower   
-	 delta_tower2_z= -shoulder_height[Y_AXIS];	 // front right tower 	
-	 delta_tower3_z= -shoulder_height[Z_AXIS];	 // back middle tower 
 }
 
+// The geometry of a GUS is such that the arms MUST push up.
+// Thus the theoretic base of each arm is below the Z == 0 plane
+// and we end up adding the shoulder offset to the cartesian z value.
 void calculate_delta(float cartesian[3])
 {					   
   delta[X_AXIS] = max_arm_length[X_AXIS] - sqrt(sq(cartesian[X_AXIS] - delta_tower1_x) +
                        sq(cartesian[Y_AXIS] - delta_tower1_y) +
-					   sq(cartesian[Z_AXIS] - delta_tower1_z));
+					   sq(cartesian[Z_AXIS] + shoulder_height[X_AXIS]));
   delta[Y_AXIS] = max_arm_length[Y_AXIS] - sqrt(sq(cartesian[X_AXIS] - delta_tower2_x) +
                        sq(cartesian[Y_AXIS] - delta_tower2_y) +
-					   sq(cartesian[Z_AXIS] - delta_tower2_z));
+					   sq(cartesian[Z_AXIS] + shoulder_height[Y_AXIS]));
   delta[Z_AXIS] = max_arm_length[Z_AXIS] - sqrt(sq(cartesian[X_AXIS] - delta_tower3_x) +
                        sq(cartesian[Y_AXIS] - delta_tower3_y) +
-					   sq(cartesian[Z_AXIS] - delta_tower3_z));
+					   sq(cartesian[Z_AXIS] + shoulder_height[Z_AXIS]));
   /*
   SERIAL_ECHOPGM("cartesian x="); SERIAL_ECHO(cartesian[X_AXIS]);
   SERIAL_ECHOPGM(" y="); SERIAL_ECHO(cartesian[Y_AXIS]);
@@ -3303,6 +3300,7 @@ void calculate_delta(float cartesian[3])
 // This needs significant rework for GUS
 void adjust_delta(float cartesian[3])
 {
+/*
   int half = (ACCURATE_BED_LEVELING_POINTS - 1) / 2;
   float grid_x = max(0.001-half, min(half-0.001, cartesian[X_AXIS] / ACCURATE_BED_LEVELING_GRID_X));
   float grid_y = max(0.001-half, min(half-0.001, cartesian[Y_AXIS] / ACCURATE_BED_LEVELING_GRID_Y));
@@ -3321,7 +3319,7 @@ void adjust_delta(float cartesian[3])
   delta[X_AXIS] += offset;
   delta[Y_AXIS] += offset;
   delta[Z_AXIS] += offset;
-
+*/
   /*
   SERIAL_ECHOPGM("grid_x="); SERIAL_ECHO(grid_x);
   SERIAL_ECHOPGM(" grid_y="); SERIAL_ECHO(grid_y);

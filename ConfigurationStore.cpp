@@ -290,8 +290,8 @@ void Config_ResetDefault()
     float tmp2[]=DEFAULT_MAX_FEEDRATE;
     long tmp3[]=DEFAULT_MAX_ACCELERATION;
 #ifdef GUS
-    float tmp4[]=DEFAULT_MAX_ARM_LENGTH;
-    float tmp5[]=DEFAULT_SHOULDER_HEIGHT;
+    float tmp4[]=MAX_ARM_LENGTH;
+    float tmp5[]=SHOULDER_HEIGHT;
 #endif GUS
     for (short i=0;i<4;i++) 
     {
@@ -317,10 +317,10 @@ void Config_ResetDefault()
 	#ifdef GUS
     for (short i=0;i<3;i++) 
     {
-        max_arm_length[i]=tmp4[i];  
+        max_arm_length[i]=tmp4[i]; 
         shoulder_height[i]=tmp5[i];
     }
-	recalc_delta_settings();
+	// recalc_delta_settings();     // Not currently needed
 	#else
 	delta_radius= DELTA_RADIUS;
 	delta_diagonal_rod= DELTA_DIAGONAL_ROD;
